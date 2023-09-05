@@ -1,0 +1,6 @@
+{
+    "snyk.advanced.additionalParameters": "--all-projects",
+    "snyk.advanced.organization": "",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "snyk.advanced.customEndpoint": "https://app.au.snyk.io/api"
+}
