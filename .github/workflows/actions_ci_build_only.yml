@@ -1,4 +1,4 @@
-name: Snyk AWS Demo using GithubActions
+name: Snyk Demo using GithubActions - no Terraform
 
 #on:
 #  push:
