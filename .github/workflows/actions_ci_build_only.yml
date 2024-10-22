@@ -51,7 +51,7 @@ jobs:
           \"target\": {
             \"owner\": \"lmaeda\",
             \"name\": \"aws-snyk-mvn-goof\",    
-            \"branch\": \"${{ github.sha }}\"
+            \"branch\": \"main\"
           }
         }" "https://api.snyk.io/v1/org/${ORG_ID}/integrations/${INTEGRATION_ID}/import"
   refresh_container:
