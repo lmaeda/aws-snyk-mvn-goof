@@ -40,13 +40,19 @@ jobs:
       run: mvn install 
     - name: scan vulnerability with Snyk
       run: |
+        # Snyk OpenSource
         snyk test --org=${ORG_ID} --all-projects --detection-depth=8 --print-deps --remote-repo-url=aws_snyk_mvn_goof --severity-threshold=low || true # *1 replace with snyk-filter or snyk-delta
+        # Snyk IaC
         snyk iac test --org=${ORG_ID} --scan=planned-values || true # *1
+        # Snyk Code
         snyk code test --org=${ORG_ID} || true # *1
     - name: monitor/report with Snyk App UI
       run: |
+        # Snyk IaC
         snyk iac test --org=${ORG_ID} --scan=planned-values --report || true # *1
+        # Snyk OpenSource
         snyk monitor --org=${ORG_ID} --all-projects --detection-depth=8 --print-deps --remote-repo-url=aws_snyk_mvn_goof # *1
+        # Snyk import from Git integration through API
         curl --request POST --header "Content-Type: application/json; charset=utf-8" --header "Authorization: token ${SNYK_TOKEN}" --data-binary "{
           \"target\": {
             \"owner\": \"lmaeda\",
@@ -61,7 +67,7 @@ jobs:
     env:
       DOCKER_BUILDKIT: "1"
       DOCKER_LOGIN: "${{ secrets.DOCKER_LOGIN }}"
-      ORG_ID: demo_high
+      ORG_ID: 96094dfc-3551-4561-ac13-11022e08aefb
       SNYK_TOKEN: "${{ secrets.SNYK_TOKEN }}"
     steps:
     - uses: actions/checkout@v1
