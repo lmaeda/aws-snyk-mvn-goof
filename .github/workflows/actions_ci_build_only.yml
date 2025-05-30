@@ -30,7 +30,7 @@ jobs:
           BRANCH_NAME="${{ github.ref_name }}"
           echo "Current branch/ref: $BRANCH_NAME"
 
-          if [[ "$BRANCH_NAME" == "production" || "$BRANCH_NAME" == "master" ]]; then
+          if [[ "$BRANCH_NAME" == "production" || "$BRANCH_NAME" == "main" ]]; then
             echo "Branch is '$BRANCH_NAME'. Setting production values."
             CRITICALITY="high"
             ENVIRONMENT="frontend,mobile"
