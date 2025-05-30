@@ -33,23 +33,25 @@ jobs:
           if [[ "$BRANCH_NAME" == "production" || "$BRANCH_NAME" == "main" ]]; then
             echo "Branch is '$BRANCH_NAME'. Setting production values."
             CRITICALITY="high"
-            ENVIRONMENT="frontend,mobile"
             LIFECYCLE="production"
           else
             echo "Branch is '$BRANCH_NAME'. Setting development values."
             CRITICALITY="medium"
-            ENVIRONMENT="frontend,mobile"
             LIFECYCLE="development"
           fi
+          ENVIRONMENT="frontend,mobile"
+          REPO_NAME="lmaeda/aws-snyk-mvn-goof"
 
           echo "project_criticality=$CRITICALITY" >> $GITHUB_ENV
-          echo "project_environment=$ENVIRONMENT" >> $GITHUB_ENV
           echo "project_lifecycle=$LIFECYCLE" >> $GITHUB_ENV
+          echo "project_environment=$ENVIRONMENT" >> $GITHUB_ENV
+          echo "repo_name=$REPO_NAME" >> $GITHUB_ENV
 
           # Also set as step outputs for job outputs
           echo "project_criticality=$CRITICALITY" >> $GITHUB_OUTPUT
-          echo "project_environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
           echo "project_lifecycle=$LIFECYCLE" >> $GITHUB_OUTPUT
+          echo "project_environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
+          echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Verify Project Environment Variables
@@ -57,6 +59,7 @@ jobs:
           echo "Project Criticality: $project_criticality"
           echo "Project Environment: $project_environment"
           echo "Project Lifecycle: $project_lifecycle"
+          echo "Repository name: $repo_name"
           echo "These variables are available for subsequent steps in this job."
 
   use_outputs_in_another_job: # Job to demonstrate using outputs from set_project_env_vars
@@ -70,6 +73,7 @@ jobs:
           echo "Project Criticality from 'set_project_env_vars' job: ${{ needs.set_project_env_vars.outputs.project_criticality }}"
           echo "Project Environment from 'set_project_env_vars' job: ${{ needs.set_project_env_vars.outputs.project_environment }}"
           echo "Project Lifecycle from 'set_project_env_vars' job: ${{ needs.set_project_env_vars.outputs.project_lifecycle }}"
+          echo "repo name from 'set_project_env_vars' job: ${{ needs.set_project_env_vars.outputs.repo_name }}"
 
   test_appcode:
     runs-on: ubuntu-latest
@@ -103,9 +107,9 @@ jobs:
     - name: monitor/report with Snyk App UI
       run: |
         # Snyk IaC
-        snyk iac test --org=${ORG_ID} --target-reference="${{ github.ref }}"  --report  --project-tags=team=frontend,app=aws_snyk_mvn_goof-iac --project-business-criticality=${{ needs.set_project_env_vars.outputs.project_criticality }} --project-environment=${{ needs.set_project_env_vars.outputs.project_environment }} --project-lifecycle=${{ needs.set_project_env_vars.outputs.project_lifecycle }} || true # *1
+        snyk iac test --org=${ORG_ID} --report --target-name=${{ needs.set_project_env_vars.outputs.repo_name }} --target-reference="${{ github.ref_name }}" --project-tags=team=frontend,app=aws_snyk_mvn_goof-iac --project-business-criticality=${{ needs.set_project_env_vars.outputs.project_criticality }} --project-environment=${{ needs.set_project_env_vars.outputs.project_environment }} --project-lifecycle=${{ needs.set_project_env_vars.outputs.project_lifecycle }} || true # *1
         # Snyk OpenSource
-        snyk monitor --org=${ORG_ID} --all-projects --target-reference="${{ github.ref }}" --project-tags=team=frontend,app=aws_snyk_mvn_goof-os --project-business-criticality=${{ needs.set_project_env_vars.outputs.project_criticality }} --project-environment=${{ needs.set_project_env_vars.outputs.project_environment }} --project-lifecycle=${{ needs.set_project_env_vars.outputs.project_lifecycle }} # *1
+        snyk monitor --org=${ORG_ID} --all-projects --target-name=${{ needs.set_project_env_vars.outputs.repo_name }} --target-reference="${{ github.ref_name }}" --project-tags=team=frontend,app=aws_snyk_mvn_goof-os --project-business-criticality=${{ needs.set_project_env_vars.outputs.project_criticality }} --project-environment=${{ needs.set_project_env_vars.outputs.project_environment }} --project-lifecycle=${{ needs.set_project_env_vars.outputs.project_lifecycle }} # *1
         # Snyk import from Git integration through API
         curl --request POST --header "Content-Type: application/json; charset=utf-8" --header "Authorization: token ${SNYK_TOKEN}" --data-binary "{
           \"target\": {
@@ -121,7 +125,7 @@ jobs:
     env:
       DOCKER_BUILDKIT: "1"
       DOCKER_LOGIN: "${{ secrets.DOCKER_LOGIN }}"
-      ORG_ID: 96094dfc-3551-4561-ac13-11022e08aefb
+      ORG_ID: 5b3f94e9-b688-4fd9-a58e-7d11d42e5335
       SNYK_TOKEN: "${{ secrets.SNYK_TOKEN }}"
     steps:
     - uses: actions/checkout@v1
@@ -130,7 +134,7 @@ jobs:
     - name: scan vulnerability
       run: docker run --env SNYK_TOKEN -v /var/run/docker.sock:/var/run/docker.sock snyk/snyk:docker snyk container test --print-deps --org=${ORG_ID} --project-name=${{github.repository}} --app-vulns --nested-jars-depth=8 ${{env.DOCKER_LOGIN}}/my-snyk-demo-mvn-goof:latest|| true # *1
     - name: monitor container image for vulnerability
-      run: docker run --env SNYK_TOKEN -v /var/run/docker.sock:/var/run/docker.sock snyk/snyk:docker snyk container monitor --org=${ORG_ID} --project-name=${{github.repository}} --app-vulns --nested-jars-depth=15 ${{env.DOCKER_LOGIN}}/my-snyk-demo-mvn-goof:latest --target-reference="${{ github.ref }}" --project-tags=team=frontend,app=aws_snyk_mvn_goof-container --project-business-criticality=${{ needs.set_project_env_vars.outputs.project_criticality }} --project-environment=${{ needs.set_project_env_vars.outputs.project_environment }} --project-lifecycle=${{ needs.set_project_env_vars.outputs.project_lifecycle }}  || true # *1
+      run: docker run --env SNYK_TOKEN -v /var/run/docker.sock:/var/run/docker.sock snyk/snyk:docker snyk container monitor --org=${ORG_ID} --project-name=${{github.repository}} --app-vulns --nested-jars-depth=15 ${{env.DOCKER_LOGIN}}/my-snyk-demo-mvn-goof:latest --target-name=${{ needs.set_project_env_vars.outputs.repo_name }} --target-reference="${{ github.ref_name }}" --project-tags=team=frontend,app=aws_snyk_mvn_goof-container --project-business-criticality=${{ needs.set_project_env_vars.outputs.project_criticality }} --project-environment=${{ needs.set_project_env_vars.outputs.project_environment }} --project-lifecycle=${{ needs.set_project_env_vars.outputs.project_lifecycle }}  || true # *1
     - name: Login to DockerHub
       uses: docker/login-action@v2
       with:
