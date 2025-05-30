@@ -23,6 +23,7 @@ jobs:
       project_criticality: ${{ steps.set_project_vars.outputs.project_criticality }}
       project_environment: ${{ steps.set_project_vars.outputs.project_environment }}
       project_lifecycle: ${{ steps.set_project_vars.outputs.project_lifecycle }}
+      repo_name: ${{ steps.set_project_vars.outputs.repo_name }}
     steps:
       - name: Set Project Environment Variables Based on Branch
         id: set_project_vars
