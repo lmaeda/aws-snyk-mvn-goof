@@ -90,8 +90,8 @@ jobs:
     container: snyk/snyk:maven-3-jdk-8	
     environment: snyk_aws_demo
     env:
-      INTEGRATION_ID: cde4a0ff-2889-4d74-b584-03bd007bc32e
-      ORG_ID: 5b3f94e9-b688-4fd9-a58e-7d11d42e5335
+      INTEGRATION_ID: 422b7405-a756-4ac4-9fe2-6e8f5dfcc690
+      ORG_ID: 4949953d-08e1-47c3-962f-22fa58f9fa77 
       SNYK_TOKEN: "${{ secrets.SNYK_TOKEN }}"
     steps:
     - uses: actions/checkout@v1
@@ -126,7 +126,7 @@ jobs:
     env:
       DOCKER_BUILDKIT: "1"
       DOCKER_LOGIN: "${{ secrets.DOCKER_LOGIN }}"
-      ORG_ID: 5b3f94e9-b688-4fd9-a58e-7d11d42e5335
+      ORG_ID: 4949953d-08e1-47c3-962f-22fa58f9fa77
       SNYK_TOKEN: "${{ secrets.SNYK_TOKEN }}"
     steps:
     - uses: actions/checkout@v1

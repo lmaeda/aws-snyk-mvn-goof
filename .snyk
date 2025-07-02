@@ -1,10 +1,9 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
-version: v1.25.0
+version: v1.25.1
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
-  SNYK-CC-TF-1:
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-2436751:
     - '*':
-        reason: None Given
-        expires: 2023-10-05T22:53:34.325Z
-        created: 2023-09-05T22:53:34.328Z
+        reason: For testing behaviors of .snyk file and SnykCLI scan when scanning container
+        created: 2025-07-02T08:15:42.518Z
 patch: {}
