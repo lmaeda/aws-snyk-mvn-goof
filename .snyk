@@ -4,6 +4,7 @@ version: v1.25.1
 ignore:
   SNYK-JAVA-ORGSPRINGFRAMEWORK-2436751:
     - '*':
-        reason: For testing behaviors of .snyk file and SnykCLI scan when scanning container
-        created: 2025-07-02T08:15:42.518Z
+        reason: Ignore of the issue added to verify the behaviour of the Snyk service
+        expires: 2028-08-01T08:34:47.964Z
+        created: 2025-07-02T08:34:47.969Z
 patch: {}
